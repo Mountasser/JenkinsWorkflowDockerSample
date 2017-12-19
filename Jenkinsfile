@@ -1,8 +1,7 @@
 #!groovy
 
-main()
 
-def void main() {
+private def void main() {
     checkEnvironment()
 
     commitStage()
@@ -24,7 +23,7 @@ def void main() {
     productionStage()
 }
 
-void checkEnvironment() {
+private void checkEnvironment() {
     node {
         sh "env"
 
@@ -38,7 +37,7 @@ void checkEnvironment() {
     }
 }
 
- def void commitStage() {
+private def void commitStage() {
     stage name: 'Commit'
 
     node {
@@ -78,7 +77,7 @@ void checkEnvironment() {
     }
 }
 
-def void integrationStage() {
+private def void integrationStage() {
     stage name: 'Integration', concurrency: 3
 
     node {
@@ -106,7 +105,7 @@ def void integrationStage() {
     }
 }
 
-def void userAcceptanceStage() {
+private def void userAcceptanceStage() {
     stage name: 'User Acceptance', concurrency: 1
 
     node {
@@ -116,17 +115,17 @@ def void userAcceptanceStage() {
     }
 }
 
-def void productionStage() {
+private def void productionStage() {
     stage name: 'Production', concurrency: 1
 
     // Do whatever is necessary
 }
 
- boolean isOnMaster() {
+private boolean isOnMaster() {
     return !env.BRANCH_NAME || env.BRANCH_NAME == 'master';
 }
 
-boolean isScmConfigured() {
+private boolean isScmConfigured() {
     // if the SCM is not configured, then the branch name is null
     return env.BRANCH_NAME;
 }
