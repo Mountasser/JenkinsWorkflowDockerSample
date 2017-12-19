@@ -2,7 +2,7 @@
 
 main()
 
-private def void main() {
+def void main() {
     checkEnvironment()
 
     commitStage()
@@ -24,7 +24,7 @@ private def void main() {
     productionStage()
 }
 
-private void checkEnvironment() {
+void checkEnvironment() {
     node {
         sh "env"
 
@@ -38,7 +38,7 @@ private void checkEnvironment() {
     }
 }
 
-private def void commitStage() {
+ def void commitStage() {
     stage name: 'Commit'
 
     node {
@@ -78,7 +78,7 @@ private def void commitStage() {
     }
 }
 
-private def void integrationStage() {
+def void integrationStage() {
     stage name: 'Integration', concurrency: 3
 
     node {
@@ -106,7 +106,7 @@ private def void integrationStage() {
     }
 }
 
-private def void userAcceptanceStage() {
+def void userAcceptanceStage() {
     stage name: 'User Acceptance', concurrency: 1
 
     node {
@@ -116,17 +116,17 @@ private def void userAcceptanceStage() {
     }
 }
 
-private def void productionStage() {
+def void productionStage() {
     stage name: 'Production', concurrency: 1
 
     // Do whatever is necessary
 }
 
-private boolean isOnMaster() {
+ boolean isOnMaster() {
     return !env.BRANCH_NAME || env.BRANCH_NAME == 'master';
 }
 
-private boolean isScmConfigured() {
+boolean isScmConfigured() {
     // if the SCM is not configured, then the branch name is null
     return env.BRANCH_NAME;
 }
