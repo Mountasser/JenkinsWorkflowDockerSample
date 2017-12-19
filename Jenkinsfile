@@ -1,6 +1,6 @@
 #!groovy
 
-main();
+main()
 
 private def void main() {
     checkEnvironment()
