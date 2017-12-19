@@ -1,30 +1,8 @@
 #!groovy
 
 
-private def void main() {
-    checkEnvironment()
 
-    commitStage()
-
-    if (!isOnMaster()) {
-        return;
-    }
-
-    integrationStage()
-
-    timeout(time: 4, unit: 'DAYS') {
-        input 'Do you want to deploy to the UAT system?'
-    }
-    userAcceptanceStage()
-
-    timeout(time: 4, unit: 'DAYS') {
-        input 'Do you want to deploy to the PRODUCTION system?'
-    }
-    productionStage()
-}
-
-private void checkEnvironment() {
-    node {
+        node {
         sh "env"
 
         echo "Building on branch: ${env.BRANCH_NAME}"
@@ -35,10 +13,8 @@ private void checkEnvironment() {
             error "You need to configure the DOCKER_HOST environment variable"
         }
     }
-}
 
-private def void commitStage() {
-    stage name: 'Commit'
+        stage name: 'Commit'
 
     node {
         if (isScmConfigured()) {
@@ -75,10 +51,12 @@ private def void commitStage() {
 
         stash(name: 'integrationtest', includes: 'integrationtest/*')
     }
-}
 
-private def void integrationStage() {
-    stage name: 'Integration', concurrency: 3
+    if (!isOnMaster()) {
+        return;
+    }
+
+   stage name: 'Integration', concurrency: 3
 
     node {
         docker.withServer(env.DOCKER_HOST) {
@@ -103,23 +81,31 @@ private def void integrationStage() {
             }
         }
     }
-}
 
-private def void userAcceptanceStage() {
-    stage name: 'User Acceptance', concurrency: 1
+    timeout(time: 4, unit: 'DAYS') {
+        input 'Do you want to deploy to the UAT system?'
+    }
+   stage name: 'User Acceptance', concurrency: 1
 
     node {
         sh "docker -H ${env.DOCKER_HOST} stop JenkinsWorkflowDockerSample || true"
         sh "docker -H ${env.DOCKER_HOST} rm JenkinsWorkflowDockerSample || true"
         sh "docker -H ${env.DOCKER_HOST} run -d -p 9090:8080 --name JenkinsWorkflowDockerSample polim/jenkins_workflow_docker_sample"
     }
-}
 
-private def void productionStage() {
+    timeout(time: 4, unit: 'DAYS') {
+        input 'Do you want to deploy to the PRODUCTION system?'
+    }
     stage name: 'Production', concurrency: 1
 
     // Do whatever is necessary
 }
+
+
+
+
+
+
 
 private boolean isOnMaster() {
     return !env.BRANCH_NAME || env.BRANCH_NAME == 'master';
